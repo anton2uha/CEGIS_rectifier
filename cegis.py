@@ -71,7 +71,6 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
             return {'success': True, 'model': candidate, 
                     'iterations': iteration, 'test_vectors': test_vectors}
         
-        # ADD COUNTEREXAMPLE using concrete evaluation
         counterexample = verifier.model()
         
         # Extract concrete input values from counterexample
@@ -81,10 +80,6 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         
         test_vectors.append(input_values)
         print(f"    Primary inputs: {input_values}") 
-        
-
-        
-        
         if verbose:
             print(f"    Counterexample: {input_values}")
         
@@ -93,17 +88,12 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         spec_values = enc_module.evaluate_circuit(spec_circuit, input_values)
         
         # Add constraints directly on parameters
-        # For each parameterized gate, constrain its parameters based on
-        # what output value the spec requires for this input
         constraints = []
         for gate_name, gate_params in param_info.items():
             gate = impl_circuit.get_gate(gate_name)
             gate_input_values = [impl_values[inp] for inp in gate.inputs]
             
-            # Get expected output from spec
-            # If this gate is an output, get the spec's output value
-            # Otherwise, we need the value that makes downstream gates correct
-            
+            # Get expected output from spec            
             #expected_output = spec_values[gate_name]
              
             
@@ -118,14 +108,12 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
             constraints.append(constraint)
         
         synth.add(And(constraints) if len(constraints) > 1 else constraints[0])
-    
+        
+    # Timeout!
     return {'success': False, 'iterations': max_iterations, 'reason': 'Maximum iterations reached'}
 
 
-# =============================================================================
-# Testing
-# =============================================================================
-
+# Testing (example blif)
 if __name__ == "__main__":
     import blif_parser
     import encoder
