@@ -1,7 +1,6 @@
 """
 CEGIS (Counter-Example Guided Inductive Synthesis) implementation.
 
-The core synthesis loop that finds parameter values making impl match spec.
 """
 
 from z3 import Solver, sat, unsat, And, Not
@@ -13,18 +12,7 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
     Run the CEGIS loop to find parameter values.
     
     Args:
-        encoding: Dictionary from encoder.encode() containing:
-            - params: Z3 parameter variables
-            - inputs: Z3 input variables
-            - behavior: Z3 behavior constraints
-            - correctness: Z3 correctness constraint
-            - impl_circuit: implementation Circuit
-            - spec_circuit: specification Circuit
-            - param_info: gate name -> parameter variables mapping
-            - input_names: list of input names
-            - output_names: list of output names
-        max_iterations: Maximum number of CEGIS iterations
-        verbose: Print progress if True
+        encoding: Dictionary from encoder.encode()
         
     Returns:
         Dictionary with:
@@ -51,7 +39,7 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         if verbose:
             print(f"  Iteration {iteration}...")
         
-        # SYNTHESIS: Find params that work for all known test vectors
+        #Find params that work for all known test vectors
         result = synth.check()
         if result == unsat:
             return {'success': False, 'iterations': iteration,
@@ -59,7 +47,7 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         
         candidate = synth.model()
         
-        # VERIFICATION: Check if candidate works for ALL inputs
+        # Check if candidate works for ALL inputs
         verifier = Solver()
         verifier.add(behavior)
         verifier.add(And([p == candidate.eval(p, model_completion=True) for p in params]))
@@ -92,9 +80,6 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         for gate_name, gate_params in param_info.items():
             gate = impl_circuit.get_gate(gate_name)
             gate_input_values = [impl_values[inp] for inp in gate.inputs]
-            
-            # Get expected output from spec            
-            #expected_output = spec_values[gate_name]
              
             
             spec_gate = spec_circuit.get_gate(gate_name)
@@ -109,7 +94,7 @@ def run(encoding: dict, max_iterations: int = 10000, verbose: bool = False) -> d
         
         synth.add(And(constraints) if len(constraints) > 1 else constraints[0])
         
-    # Timeout!
+    # Timeout
     return {'success': False, 'iterations': max_iterations, 'reason': 'Maximum iterations reached'}
 
 

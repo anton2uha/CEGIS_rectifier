@@ -3,18 +3,6 @@ BLIF (Berkeley Logic Interchange Format) parser.
 
 Parses .blif files into Circuit objects.
 
-Supported constructs:
-    .model <name>
-    .inputs <net> <net> ...
-    .outputs <net> <net> ...
-    .names <input1> <input2> ... <output>
-    <truth table rows>
-    .end
-
-Not supported:
-    .latch (sequential elements)
-    .subckt (hierarchical designs)
-    .gate (library gates)
 """
 
 from circuit_types import TruthTable, Gate, Circuit
@@ -31,15 +19,6 @@ class BlifParseError(Exception):
 def parse(filename: str) -> Circuit:
     """
     Parse a BLIF file and return a Circuit.
-    
-    Args:
-        filename: Path to .blif file
-        
-    Returns:
-        Circuit object
-        
-    Raises:
-        BlifParseError: If parsing fails
     """
     with open(filename, 'r') as f:
         content = f.read()
@@ -49,8 +28,6 @@ def parse(filename: str) -> Circuit:
 def parse_string(content: str) -> Circuit:
     """
     Parse BLIF content from a string.
-    
-    Useful for testing without files.
     """
     lines = _preprocess(content)
     return _parse_lines(lines)

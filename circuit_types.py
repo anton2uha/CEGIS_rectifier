@@ -8,13 +8,6 @@ class TruthTable:
     """
     Represents a gate's logic function using onset cubes.
     
-    Onset cubes list input patterns where output = 1.
-    Each cube is a string: '1' = must be true, '0' = must be false, '-' = don't care
-    
-    Example - OR gate:
-        num_inputs: 2
-        onset_cubes: ["1-", "-1"]  # output=1 if first input=1 OR second input=1
-    
     Example - AND gate:
         num_inputs: 2
         onset_cubes: ["11"]  # output=1 only if both inputs=1
@@ -81,11 +74,6 @@ class TruthTable:
 class Gate:
     """
     A single logic gate in the circuit.
-    
-    Attributes:
-        name: Output net name (unique identifier for this gate)
-        inputs: List of input net names
-        truth_table: The gate's logic function
     """
     name: str
     inputs: list[str]
@@ -99,12 +87,6 @@ class Gate:
 class Circuit:
     """
     Complete circuit representation.
-    
-    Attributes:
-        name: Circuit/model name
-        primary_inputs: List of primary input net names
-        primary_outputs: List of primary output net names  
-        gates: List of all gates in the circuit
     """
     name: str
     primary_inputs: list[str]

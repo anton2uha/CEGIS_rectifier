@@ -2,29 +2,17 @@
 Z3 encoder for circuits.
 
 Converts Circuit objects into Z3 boolean formulas for CEGIS-based rectification.
-
-Main function:
-    encode(impl_circuit, spec_circuit, gates_to_fix) -> dict with everything CEGIS needs
 """
 
 from z3 import Bool, And, Or, Not, If, Implies, BoolRef
 from circuit_types import Circuit, Gate, TruthTable
 
 
-# =============================================================================
 # Gate Encoding
-# =============================================================================
 
 def encode_fixed_gate(inputs: list[BoolRef], tt: TruthTable) -> BoolRef:
     """
     Encode a gate with a fixed truth table.
-    
-    Args:
-        inputs: Z3 boolean expressions for gate inputs
-        tt: Truth table defining the gate function
-        
-    Returns:
-        Z3 expression for the gate output
     """
     if tt.num_inputs == 0:
         # Constant gate
@@ -65,12 +53,6 @@ def encode_parameterized_gate(inputs: list[BoolRef], params: list[BoolRef]) -> B
     For 1-input gates: 2 parameters [p0, p1]
         p0 = f(0), p1 = f(1)
         
-    Args:
-        inputs: Z3 boolean expressions for gate inputs
-        params: Z3 boolean parameter variables
-        
-    Returns:
-        Z3 expression for parameterized output
     """
     if len(inputs) == 2:
         if len(params) != 4:
@@ -98,12 +80,6 @@ def encode_parameterized_gate(inputs: list[BoolRef], params: list[BoolRef]) -> B
 def params_to_gate_type(param_values: list[bool]) -> str:
     """
     Convert parameter values to human-readable gate type.
-    
-    Args:
-        param_values: List of boolean values for parameters
-        
-    Returns:
-        Gate type name (e.g., "AND", "OR", "XOR")
     """
     tt = ''.join('1' if p else '0' for p in param_values)
     
@@ -135,20 +111,12 @@ def params_to_gate_type(param_values: list[bool]) -> str:
     return gate_types.get(tt, f"UNKNOWN({tt})")
 
 
-# =============================================================================
+
 # Circuit Evaluation (for CEGIS counterexample handling)
-# =============================================================================
 
 def evaluate_gate(tt: TruthTable, inputs: list[bool]) -> bool:
     """
     Evaluate a gate's truth table with concrete input values.
-    
-    Args:
-        tt: Truth table defining the gate
-        inputs: Concrete boolean input values
-        
-    Returns:
-        The gate's output value
     """
     for cube in tt.onset_cubes:
         match = True
@@ -220,9 +188,8 @@ def get_parameterized_constraint(input_values: list[bool], expected_output: bool
         return Not(params[index])
 
 
-# =============================================================================
+
 # Circuit Encoding
-# =============================================================================
 
 def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str]) -> dict:
     """
@@ -250,11 +217,6 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
             'input_names': list of primary input names
             'output_names': list of primary output names
     """
-
-
-    
-    
-
 
 
     # Validate inputs match
@@ -355,13 +317,6 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
 def extract_solution(model, param_info: dict) -> dict:
     """
     Extract gate fixes from a Z3 model.
-    
-    Args:
-        model: Z3 model from a successful CEGIS run
-        param_info: dict mapping gate names to parameter variables
-        
-    Returns:
-        dict mapping gate names to their fixed gate type
     """
     fixes = {}
     
@@ -382,9 +337,7 @@ def extract_solution(model, param_info: dict) -> dict:
     return fixes
 
 
-# =============================================================================
 # Testing
-# =============================================================================
 
 if __name__ == "__main__":
     from z3 import Solver, sat
