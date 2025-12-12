@@ -95,7 +95,7 @@ Examples:
         gate = impl_circuit.get_gate(gate_name)
         if gate and gate.num_inputs() > 2:
             print(f"Error: Gate '{gate_name}' has {gate.num_inputs()} inputs. "
-                  f"Only gates with ≤2 inputs are supported for parameterization.",
+                  f"Only gates with <=2 inputs are supported for parameterization.",
                   file=sys.stderr)
             sys.exit(1)
     

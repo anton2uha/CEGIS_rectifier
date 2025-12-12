@@ -6,6 +6,8 @@
 
 This project intends to implement a rectifier similar to Fujita (2012). We will take a sample circuit as a `.blif`, and label it as a Specification. We will make one arbitrary change as a bug, take note of the gate, and call it a Bugged model. Then, we will use CEGIS to identify which gates need to be replaced and with what functions. We want to replicate the result that even though the search space is exponentially large, only a small number of test patterns (~a few hundred) are needed to identify the correct fixes.
 
+There aren't many preliminaries to this report beyond understanding satisfiability proofs and rectification.
+
 
 
 #### Literature Review
@@ -49,6 +51,15 @@ Fixes found:
 
 
 #### Experimentation with multi-fix
+
+#### What we Learned
+
+This project solidified our understanding of 
+We also had to learn what SMT is and how it's distinguished from regular SAT. We've heard a lot about the applications of SMT proofs, and are glad to have learned how to interface with Z3
+
+#### Division of Labor
+Anthony: `cegis.py`, `circuit_types.py`, the lion's share of the rest of the code, and devised pseudocode for the project
+Byron: `blif_encoder.py`, parts of `main.py` and `encoder.py`, most of the report writing, and multi-fix experimentation
 
 
 
