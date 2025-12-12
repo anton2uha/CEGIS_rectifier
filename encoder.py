@@ -110,10 +110,6 @@ def params_to_gate_type(param_values: list[bool]) -> str:
     
     return gate_types.get(tt, f"UNKNOWN({tt})")
 
-
-
-# Circuit Evaluation (for CEGIS counterexample handling)
-
 def evaluate_gate(tt: TruthTable, inputs: list[bool]) -> bool:
     """
     Evaluate a gate's truth table with concrete input values.
@@ -218,7 +214,6 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
             'output_names': list of primary output names
     """
 
-
     # Validate inputs match
     if set(impl_circuit.primary_inputs) != set(spec_circuit.primary_inputs):
         raise ValueError("Circuits have different primary inputs")
@@ -226,7 +221,6 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
         raise ValueError("Circuits have different primary outputs")
     
 
-    # Storage for results
     params = []           # All parameter variables
     param_info = {}       # gate_name -> [param vars]
     signals = {}          # net_name -> Z3 var (for debugging)
@@ -239,8 +233,8 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
         signals[pi] = var
         input_vars.append(var)
     
-    # Encode implementation circuit
-    impl_signals = dict(signals)  # Start with primary inputs
+    # Encode implementation circuit, starting with primary inputs
+    impl_signals = dict(signals)
 
     
     for gate in impl_circuit.topological_sort():
@@ -254,7 +248,7 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
         
         # Encode gate function
         if gate.name in gates_to_fix:
-            # Parameterized gate
+            # The number of parameters is the powerset
             num_params = 2 ** gate.num_inputs()
             gate_params = [Bool(f"p_{gate.name}_{i}") for i in range(num_params)]
             params.extend(gate_params)
@@ -262,7 +256,7 @@ def encode(impl_circuit: Circuit, spec_circuit: Circuit, gates_to_fix: set[str])
             
             gate_func = encode_parameterized_gate(gate_inputs, gate_params)
         else:
-            # Fixed gate
+            # Fixed gate!
             gate_func = encode_fixed_gate(gate_inputs, gate.truth_table)
         
         # Add constraint: output == function(inputs)
